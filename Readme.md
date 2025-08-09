@@ -1,4 +1,4 @@
 Steps to update:
 
-1) cd C:\Users\haneesh\Desktop\DEVOPS_WORKSPACE\Windows_Update\
+1) cd C:\Users\Your_File_Location
 2) .\winget_upgrade_system.ps1
