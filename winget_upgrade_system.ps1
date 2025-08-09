@@ -1,3 +1,4 @@
+winget upgrade
 $packages = winget upgrade | Select-Object -Skip 1 | ForEach-Object {
     # Match columns: Name, Id, Version, Available
     if ($_ -match '^(?<Name>.+?)\s{2,}(?<Id>[^\s]+)\s{2,}(?<Version>[^\s]+)\s{2,}(?<Available>[^\s]+)') {
