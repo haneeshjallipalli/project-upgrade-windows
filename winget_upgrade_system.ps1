@@ -10,18 +10,33 @@ $packages = winget upgrade | Select-Object -Skip 1 | ForEach-Object {
     }
 }
 
-$packages | Where-Object {
-    # Extract major & minor from current and available versions
-    $curParts = ($_.Version -split '[^0-9]+' | Where-Object { $_ -match '^\d+$' })
-    $newParts = ($_.Available -split '[^0-9]+' | Where-Object { $_ -match '^\d+$' })
+# Split into included and excluded
+$included = @()
+$excluded = @()
 
-    # Ensure we have at least two parts for comparison
+foreach ($pkg in $packages) {
+    $curParts = ($pkg.Version -split '[^0-9]+' | Where-Object { $_ -match '^\d+$' })
+    $newParts = ($pkg.Available -split '[^0-9]+' | Where-Object { $_ -match '^\d+$' })
+
     if ($curParts.Count -lt 2) { $curParts += 0 }
     if ($newParts.Count -lt 2) { $newParts += 0 }
 
-    # Compare major (index 0) or minor (index 1)
-    ($curParts[0] -ne $newParts[0]) -or ($curParts[1] -ne $newParts[1])
-} | ForEach-Object {
-    Write-Host "Upgrading $($_.Name) from $($_.Version) to $($_.Available)..." -ForegroundColor Yellow
-    winget upgrade --id $_.Id --accept-source-agreements --accept-package-agreements
+    if (($curParts[0] -ne $newParts[0]) -or ($curParts[1] -ne $newParts[1])) {
+        $included += $pkg
+    }
+    else {
+        $excluded += $pkg
+    }
 }
+
+Write-Host "`n=== Included in Upgrade (Major/Minor change) ===" -ForegroundColor Green
+$included | Format-Table Name, Version, Available
+
+Write-Host "`n=== Excluded from Upgrade (Patch-only change) ===" -ForegroundColor Red
+$excluded | Format-Table Name, Version, Available
+
+#Uncomment below to actually run upgrades
+ foreach ($pkg in $included) {
+     Write-Host "Upgrading $($pkg.Name)..." -ForegroundColor Yellow
+     winget upgrade --id $pkg.Id --accept-source-agreements --accept-package-agreements
+ }

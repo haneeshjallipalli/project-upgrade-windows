@@ -1,0 +1,10 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+# Environment-dependent path to Maven home directory
+/mavenHomeManager.xml
+/misc.xml
+/modules.xml
+/vcs.xml
+/Windows_Update.iml
+/.idea
